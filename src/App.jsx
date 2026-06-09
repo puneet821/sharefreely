@@ -40,11 +40,8 @@ function App() {
   }, [activeTab]);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Helper to get namespaced cache keys
-  const getCacheKey = (key) => currentUser ? `${currentUser}_${key}` : `guest_${key}`;
-
+  // Initialize PeerJS only once
   useEffect(() => {
-    // Generate a simple 6-digit ID
     const id = Math.floor(100000 + Math.random() * 900000).toString();
     setMyId(id);
 
@@ -62,11 +59,22 @@ function App() {
 
     setPeer(newPeer);
 
-    // Load cached history on startup or user change
+    return () => {
+      newPeer.destroy();
+    };
+  }, []);
+
+  // Load cache when currentUser changes
+  useEffect(() => {
     const loadCache = async () => {
+      if (!currentUser) {
+        setSentFiles([]);
+        setReceivedFiles([]);
+        return;
+      }
       try {
-        const cachedSent = await localforage.getItem(getCacheKey('sentFiles'));
-        const cachedReceived = await localforage.getItem(getCacheKey('receivedFiles'));
+        const cachedSent = await localforage.getItem(`${currentUser}_sentFiles`);
+        const cachedReceived = await localforage.getItem(`${currentUser}_receivedFiles`);
 
         if (cachedSent) {
           const restoredSent = cachedSent.map(item => ({
@@ -92,11 +100,20 @@ function App() {
       }
     };
     loadCache();
-
-    return () => {
-      newPeer.destroy();
-    };
   }, [currentUser]);
+
+  // Save files to cache ONLY if logged in
+  useEffect(() => {
+    if (currentUser && receivedFiles.length > 0) {
+      localforage.setItem(`${currentUser}_receivedFiles`, receivedFiles.map(f => ({ ...f, url: null })));
+    }
+  }, [receivedFiles, currentUser]);
+
+  useEffect(() => {
+    if (currentUser && sentFiles.length > 0) {
+      localforage.setItem(`${currentUser}_sentFiles`, sentFiles.map(f => ({ ...f, url: null })));
+    }
+  }, [sentFiles, currentUser]);
 
   const setupConnection = (conn) => {
     conn.on('open', () => {
@@ -118,7 +135,7 @@ function App() {
             size: fileBlob.size,
             mimeType: data.mimeType
           }];
-          localforage.setItem(getCacheKey('receivedFiles'), newFiles.map(f => ({ ...f, url: null })));
+          }];
           setUnreadCount(prev => prev + 1);
           return newFiles;
         });
@@ -146,7 +163,7 @@ function App() {
               size: fileBlob.size,
               mimeType: fileData.mimeType
             }];
-            localforage.setItem(getCacheKey('receivedFiles'), newFiles.map(f => ({ ...f, url: null })));
+            }];
             setUnreadCount(prev => prev + 1);
             return newFiles;
           });
@@ -192,7 +209,6 @@ function App() {
       });
       
       const updatedFiles = [...prev, ...newSentFiles];
-      localforage.setItem(getCacheKey('sentFiles'), updatedFiles.map(f => ({ ...f, url: null })));
       return updatedFiles;
     });
     setFilesToSend([]);
