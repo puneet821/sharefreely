@@ -30,7 +30,14 @@ function App() {
   const incomingFiles = useRef({});
 
   const [activeTab, setActiveTab] = useState('home');
+  const [unreadCount, setUnreadCount] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    if (activeTab === 'received') {
+      setUnreadCount(0);
+    }
+  }, [activeTab]);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Helper to get namespaced cache keys
@@ -112,6 +119,7 @@ function App() {
             mimeType: data.mimeType
           }];
           localforage.setItem(getCacheKey('receivedFiles'), newFiles.map(f => ({ ...f, url: null })));
+          setUnreadCount(prev => prev + 1);
           return newFiles;
         });
       } else if (data.type === 'file-start') {
@@ -139,6 +147,7 @@ function App() {
               mimeType: fileData.mimeType
             }];
             localforage.setItem(getCacheKey('receivedFiles'), newFiles.map(f => ({ ...f, url: null })));
+            setUnreadCount(prev => prev + 1);
             return newFiles;
           });
           
@@ -253,6 +262,17 @@ function App() {
       <main className="main-content">
         {activeTab === 'home' && (
           <>
+            {unreadCount > 0 && (
+              <div className="new-file-alert animate-slide-up" onClick={() => setActiveTab('received')}>
+                <div className="alert-icon">🔔</div>
+                <div className="alert-text">
+                  <strong>New File Received!</strong>
+                  <span>You have {unreadCount} new file{unreadCount > 1 ? 's' : ''} waiting.</span>
+                </div>
+                <button className="view-btn">View</button>
+              </div>
+            )}
+            
             <DeviceConnector 
               myId={myId}
               isConnected={isConnected} 
@@ -286,7 +306,7 @@ function App() {
         )}
       </main>
 
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} unreadCount={unreadCount} />
       
       {showAuthModal && (
         <AuthModal 
