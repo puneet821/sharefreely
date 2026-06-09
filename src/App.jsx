@@ -135,7 +135,6 @@ function App() {
             size: fileBlob.size,
             mimeType: data.mimeType
           }];
-          }];
           setUnreadCount(prev => prev + 1);
           return newFiles;
         });
@@ -162,7 +161,6 @@ function App() {
               fileBlob: fileBlob,
               size: fileBlob.size,
               mimeType: fileData.mimeType
-            }];
             }];
             setUnreadCount(prev => prev + 1);
             return newFiles;
