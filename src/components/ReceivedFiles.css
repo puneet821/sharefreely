@@ -1,0 +1,92 @@
+.received-files-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.received-header h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+/* ... existing code ... */
+
+.download-button {
+  background: var(--surface-highlight);
+  color: var(--text-primary);
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.download-button:hover {
+  background: var(--text-primary);
+  color: var(--bg-color);
+}
+
+.received-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.received-item {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s ease;
+}
+
+.received-item:hover {
+  transform: scale(1.02);
+}
+
+.received-preview {
+  height: 140px;
+  background-color: var(--surface-highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.received-preview img, .received-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.generic-icon {
+  font-size: 3rem;
+}
+
+.received-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.received-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.received-size {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
