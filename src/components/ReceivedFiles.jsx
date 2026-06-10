@@ -31,7 +31,7 @@ const ReceivedFiles = ({ files, onRemove }) => {
     <div className="received-files-container animate-slide-up">
       <div className="received-header">
         <h3>Received Files ({files.length})</h3>
-        {files.length > 1 && (
+        {files.length > 0 && (
           <button 
             className="download-all-button"
             onClick={handleDownloadAll}
