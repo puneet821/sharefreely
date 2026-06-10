@@ -1,7 +1,7 @@
 import React from 'react';
 import './ReceivedFiles.css';
 
-const ReceivedFiles = ({ files }) => {
+const ReceivedFiles = ({ files, onRemove }) => {
   const formatSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -19,10 +19,27 @@ const ReceivedFiles = ({ files }) => {
     document.body.removeChild(a);
   };
 
+  const handleDownloadAll = () => {
+    files.forEach((file, index) => {
+      setTimeout(() => {
+        handleDownload(file);
+      }, index * 200);
+    });
+  };
+
   return (
     <div className="received-files-container animate-slide-up">
       <div className="received-header">
         <h3>Received Files ({files.length})</h3>
+        {files.length > 1 && (
+          <button 
+            className="download-all-button"
+            onClick={handleDownloadAll}
+            title="Download all files at once"
+          >
+            Download All
+          </button>
+        )}
       </div>
       
       <div className="received-grid">
@@ -38,6 +55,13 @@ const ReceivedFiles = ({ files }) => {
                 {!isImage && !isVideo && (
                   <div className="generic-icon">📥</div>
                 )}
+                <button 
+                  className="remove-file-button" 
+                  onClick={() => onRemove(index)}
+                  title="Remove from history"
+                >
+                  ✕
+                </button>
               </div>
               <div className="received-info">
                 <span className="received-name" title={file.name}>{file.name}</span>

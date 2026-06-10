@@ -5,9 +5,33 @@
   margin-top: 1rem;
 }
 
+.received-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .received-header h3 {
   font-size: 1.25rem;
   color: var(--text-primary);
+  margin: 0;
+}
+
+.download-all-button {
+  background: var(--primary-color);
+  color: var(--bg-color);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.download-all-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* ... existing code ... */
@@ -56,6 +80,36 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  position: relative;
+}
+
+.remove-file-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 10;
+  border: none;
+  cursor: pointer;
+}
+
+.received-item:hover .remove-file-button {
+  opacity: 1;
+}
+
+.remove-file-button:hover {
+  background: rgba(239, 68, 68, 0.9);
+  transform: scale(1.1);
 }
 
 .received-preview img, .received-preview video {

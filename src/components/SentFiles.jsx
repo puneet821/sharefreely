@@ -1,7 +1,7 @@
 import React from 'react';
 import './SentFiles.css';
 
-const SentFiles = ({ files }) => {
+const SentFiles = ({ files, onRemove }) => {
   const formatSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -29,6 +29,13 @@ const SentFiles = ({ files }) => {
                 {!isImage && !isVideo && (
                   <div className="generic-icon">📤</div>
                 )}
+                <button 
+                  className="remove-file-button" 
+                  onClick={() => onRemove(index)}
+                  title="Remove from history"
+                >
+                  ✕
+                </button>
               </div>
               <div className="sent-info">
                 <span className="sent-name" title={file.name}>{file.name}</span>

@@ -32,6 +32,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [unreadCount, setUnreadCount] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isCacheLoaded, setIsCacheLoaded] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'received') {
@@ -97,6 +99,8 @@ function App() {
         }
       } catch (err) {
         console.error("Error loading cache", err);
+      } finally {
+        setIsCacheLoaded(true);
       }
     };
     loadCache();
@@ -104,16 +108,16 @@ function App() {
 
   // Save files to cache ONLY if logged in
   useEffect(() => {
-    if (currentUser && receivedFiles.length > 0) {
+    if (isCacheLoaded && currentUser) {
       localforage.setItem(`${currentUser}_receivedFiles`, receivedFiles.map(f => ({ ...f, url: null })));
     }
-  }, [receivedFiles, currentUser]);
+  }, [receivedFiles, currentUser, isCacheLoaded]);
 
   useEffect(() => {
-    if (currentUser && sentFiles.length > 0) {
+    if (isCacheLoaded && currentUser) {
       localforage.setItem(`${currentUser}_sentFiles`, sentFiles.map(f => ({ ...f, url: null })));
     }
-  }, [sentFiles, currentUser]);
+  }, [sentFiles, currentUser, isCacheLoaded]);
 
   const setupConnection = (conn) => {
     conn.on('open', () => {
@@ -234,6 +238,15 @@ function App() {
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setShowProfileMenu(false);
+  };
+
+  const handleRemoveSentFile = (indexToRemove) => {
+    setSentFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  const handleRemoveReceivedFile = (indexToRemove) => {
+    setReceivedFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   return (
@@ -252,12 +265,36 @@ function App() {
       <header className="header animate-slide-up">
         <h1>ShareFreely</h1>
         {currentUser ? (
-          <div 
-            className="header-avatar clickable" 
-            onClick={handleLogout}
-            title="Click to Logout"
-          >
-            {currentUser.charAt(0).toUpperCase()}
+          <div className="header-profile-container">
+            <div 
+              className="header-avatar clickable" 
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              title="Profile"
+            >
+              {currentUser.charAt(0).toUpperCase()}
+            </div>
+            
+            {showProfileMenu && (
+              <div className="profile-dropdown animate-slide-up">
+                <div className="profile-dropdown-header">
+                  <strong>{currentUser}</strong>
+                </div>
+                <div className="profile-dropdown-stats">
+                  <div><span>Files Sent:</span> <strong>{sentFiles.length}</strong></div>
+                  <div><span>Files Received:</span> <strong>{receivedFiles.length}</strong></div>
+                </div>
+                <div className="profile-dropdown-actions">
+                  <button onClick={handleLogout} className="logout-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <button 
@@ -312,11 +349,11 @@ function App() {
         )}
 
         {activeTab === 'sent' && (
-          <SentFiles files={sentFiles} />
+          <SentFiles files={sentFiles} onRemove={handleRemoveSentFile} />
         )}
 
         {activeTab === 'received' && (
-          <ReceivedFiles files={receivedFiles} />
+          <ReceivedFiles files={receivedFiles} onRemove={handleRemoveReceivedFile} />
         )}
       </main>
 
